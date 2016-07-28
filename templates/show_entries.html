@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block body %}
+   <form  class="add-entry">
+     <fieldset>
+
+       <legend>Costumer data</legend>
+       <dl>
+	 <dt>ID:
+         <dd><input type="integer" size="30" name="id">
+	 <dt>Name:
+         <dd><input type="text" size="30" name="name">
+         <dt>Last Name:
+         <dd><input type="text" size="30" name="last_name">
+         <dt>Date of birth:
+         <dd><input type="date" size="30" name="date_of_birth">
+       </dl>
+       <button type="submit" formmethod="post" formaction="{{ url_for('add_entry') }}" value="Submit">Save</button>
+       <button type="submit" formmethod="post" formaction="{{ url_for('modify_entry') }}" value="Submit">Modify</button>
+       <button type="submit" formmethod="post" formaction="{{ url_for('remove_entry') }}" value="Submit">Remove</button>
+     </fieldset>
+   </form>
+
+  <ul class="entries">
+  {% for entry in entries %}
+    <li><h3>ID:{{ entry.id }} Name:{{ entry.name|safe }} Last Name:{{ entry.last_name|safe }} Birthday:{{ entry.date_of_birth|safe }}</h3>
+    <dt>Points: {{ entry.points }}
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
