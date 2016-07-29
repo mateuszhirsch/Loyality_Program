@@ -22,7 +22,7 @@
 
   <ul class="entries">
   {% for entry in entries %}
-    <li><h3>ID:{{ entry.id }} Name:{{ entry.name|safe }} Last Name:{{ entry.last_name|safe }} Birthday:{{ entry.date_of_birth|safe }}</h3>
+    <h3>ID:{{ entry.id }} Name:{{ entry.name|safe }} Last Name:{{ entry.last_name|safe }} Birthday:{{ entry.date_of_birth|safe }}</h3>
     <dt>Points: {{ entry.points }}
   {% else %}
     <li><em>Unbelievable.  No entries here so far</em>
