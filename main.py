@@ -24,7 +24,7 @@ def add_points():
     cur = db.execute('SELECT last_insert_rowid()')
     row = cur.fetchone()[0]
     for i in range(30):
-        threading.Timer((i+1)*6, add_default_points,[row]).start()
+        threading.Timer((i+1)*60, add_default_points,[row]).start()
     return
 
 def add_default_points(row):
