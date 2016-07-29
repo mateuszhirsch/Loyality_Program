@@ -1,3 +1,6 @@
+import random
+import threading
+import json
 import sqlite3
 import os
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
@@ -17,9 +20,23 @@ app.config.from_envvar('FLASKR_SETTINGS', silent = True)
 
 # Function whitch add every minute default number of points (0-10) by first 30 minutes afters creating new coustumer
 def add_points():
-    """Add defaults points (0-10) every minute by 30 min to new created account """
+    db = get_db()
+    cur = db.execute('SELECT last_insert_rowid()')
+    row = cur.fetchone()[0]
+    for i in range(30):
+        threading.Timer((i+1)*6, add_default_points,[row]).start()
+    return
 
-
+def add_default_points(row):
+    with app.app_context():
+        db = get_db()
+        #FUP Add some if statment to check if record wasn't deleted
+        cur = db.execute('select points from customers where id=?', [row])
+        points = cur.fetchone()[0]
+        points = points+random.randrange(10)
+        db.execute('update customers set points=? where id=?', [points,row])
+        db.commit()
+        return
 
 # Connects to the database
 def connect_db():
@@ -71,6 +88,7 @@ def add_entry():
     db.execute('insert into customers (name, last_name, date_of_birth, points) values (?, ?, ?, 0)', [request.form['name'], request.form['last_name'], request.form['date_of_birth']])
     db.commit()
     flash('New entry was successfully posted')
+    add_points();
     return redirect(url_for('show_entries'))
 
 # Delets a record from the database
