@@ -78,6 +78,19 @@ def show_entries():
     db = get_db()
     cur = db.execute('select id, name, last_name, date_of_birth, points from customers')
     entries = cur.fetchall()
+    # Code to make encode JSON data
+    # dict = {}
+    # all_querry = []
+    # for query in db.execute('select id, name, last_name, date_of_birth, points from customers'):
+    #     dict = {
+    #         'id' : query[0],
+    #         'name' : query[1],
+    #         'last_name' : query[2],
+    #         'date_of_birth' : query[3]
+    #     }
+    #     all_querry.append(dict)
+    # entries = json.dumps(all_querry)
+    # print(entries)
     return render_template('show_entries.html', entries=entries)
 
 
