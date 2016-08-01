@@ -19,24 +19,22 @@ app.config.update(dict(
 app.config.from_envvar('FLASKR_SETTINGS', silent = True)
 
 # Function whitch add every minute default number of points (0-10) by first 30 minutes afters creating new coustumer
-def add_points():
-    db = get_db()
-    cur = db.execute('SELECT last_insert_rowid()')
-    row = cur.fetchone()[0]
-    for i in range(30):
-        threading.Timer((i+1)*60, add_default_points,[row]).start()
-    return
-
-def add_default_points(row):
+def add_points(id):
     with app.app_context():
         db = get_db()
         #FUP Add some if statment to check if record wasn't deleted
-        cur = db.execute('select points from customers where id=?', [row])
+        cur = db.execute('select points from customers where id=?', [id])
         points = cur.fetchone()[0]
         points = points+random.randrange(10)
-        db.execute('update customers set points=? where id=?', [points,row])
+        db.execute('update customers set points=? where id=?', [points,id])
+        cur = db.execute('select cycles from new_customers where id=?', [id])
+        cycles = cur.fetchone()[0]
+        db.execute('update new_customers set cycles=? where id=?', [cycles-1,id])
         db.commit()
-        return
+        if (cycles < 2):
+            return
+        threading.Timer(60, add_points,[id]).start()
+    return
 
 # Connects to the database
 def connect_db():
@@ -99,9 +97,12 @@ def show_entries():
 def add_entry():
     db = get_db()
     db.execute('insert into customers (name, last_name, date_of_birth, points) values (?, ?, ?, 0)', [request.form['name'], request.form['last_name'], request.form['date_of_birth']])
+    cur = db.execute('select id from customers where name=? and last_name=? and date_of_birth=? order by id desc', [request.form['name'], request.form['last_name'], request.form['date_of_birth']])
+    entries = cur.fetchone()
+    db.execute('insert into new_customers (id, cycles) values (?, 30)', [entries[0]])
     db.commit()
     flash('New entry was successfully posted')
-    add_points();
+    add_points(entries[0]);
     return redirect(url_for('show_entries'))
 
 # Delets a record from the database
