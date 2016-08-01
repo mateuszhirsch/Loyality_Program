@@ -6,3 +6,8 @@ create table customers (
        date_of_birth date not null,
        points integer not null
 );
+drop table if exists new_customers;
+create table new_customers (
+       id integer not null,
+       cycles integer not null
+);
